@@ -5,6 +5,8 @@
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="description" content="Персональный кулинарный ассистент с AI">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#1A1A1A">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="Culinario">
@@ -12,25 +14,70 @@
   <link rel="icon" type="image/png" href="favicon.png"/>
   <title>Culinario</title>
   <link rel="manifest" href="manifest.json">
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script>
     var serviceWorkerVersion = null;
+    // Prevent zooming on mobile devices
+    document.addEventListener('touchmove', function (event) {
+      if (event.scale !== 1) {
+        event.preventDefault();
+      }
+    }, { passive: false });
   </script>
+  <style>
+    body {
+      background-color: #1A1A1A;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+    .loading {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      width: 100vw;
+      background-color: #1A1A1A;
+    }
+    .loading img {
+      width: 80px;
+      height: 80px;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(0.95); opacity: 0.5; }
+      50% { transform: scale(1); opacity: 1; }
+      100% { transform: scale(0.95); opacity: 0.5; }
+    }
+  </style>
   <script src="flutter.js" defer></script>
 </head>
 <body>
+  <div id="loading" class="loading">
+    <!-- Add loading animation here if needed -->
+  </div>
   <script>
     window.addEventListener('load', function(ev) {
+      // Hide loading indicator
+      var loading = document.querySelector('#loading');
+      
       _flutter.loader.loadEntrypoint({
         serviceWorker: {
           serviceWorkerVersion: serviceWorkerVersion,
         },
         onEntrypointLoaded: function(engineInitializer) {
+          loading.style.display = 'flex';
           engineInitializer.initializeEngine().then(function(appRunner) {
+            loading.style.display = 'none';
             appRunner.runApp();
           });
         }
       });
     });
+
+    // Initialize Telegram WebApp
+    window.Telegram.WebApp.ready();
+    window.Telegram.WebApp.expand();
   </script>
 </body>
 </html>
