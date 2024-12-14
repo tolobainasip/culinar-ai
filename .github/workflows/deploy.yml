@@ -16,28 +16,38 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - uses: subosito/flutter-action@v2
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
         with:
-          channel: 'stable'
           flutter-version: '3.16.0'
+          channel: 'stable'
+          cache: true
       
-      - name: Enable Web
+      - name: Show Flutter version
+        run: flutter --version
+      
+      - name: Enable web
         run: flutter config --enable-web
-        
-      - name: Get dependencies
-        run: flutter pub get
-        
+      
+      - name: Install dependencies
+        run: |
+          flutter pub get
+          flutter doctor -v
+      
       - name: Build
-        run: flutter build web --web-renderer canvaskit --release --base-href /culinar-ai/
-        
+        run: |
+          flutter build web --web-renderer canvaskit --release --base-href /culinar-ai/
+          ls -la build/web
+      
       - name: Setup Pages
         uses: actions/configure-pages@v3
-
+      
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
         with:
-          path: './build/web'
-
+          path: 'build/web'
+      
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v2
