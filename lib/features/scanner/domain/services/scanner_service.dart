@@ -3,6 +3,7 @@ import 'package:camera/camera.dart';
 import 'package:google_mlkit_object_detection/google_mlkit_object_detection.dart';
 import 'package:google_mlkit_image_labeling/google_mlkit_image_labeling.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class ScannerService {
   CameraController? _cameraController;
@@ -11,8 +12,16 @@ class ScannerService {
 
   Future<void> initialize() async {
     if (!_isInitialized) {
+      // Запрос разрешения на использование камеры
+      final status = await Permission.camera.request();
+      if (status.isDenied) {
+        throw Exception('Camera permission is required');
+      }
+
       final cameras = await availableCameras();
-      if (cameras.isEmpty) return;
+      if (cameras.isEmpty) {
+        throw Exception('No cameras available');
+      }
 
       _cameraController = CameraController(
         cameras.first,
@@ -20,8 +29,12 @@ class ScannerService {
         enableAudio: false,
       );
 
-      await _cameraController?.initialize();
-      _isInitialized = true;
+      try {
+        await _cameraController?.initialize();
+        _isInitialized = true;
+      } catch (e) {
+        throw Exception('Failed to initialize camera: $e');
+      }
     }
   }
 
@@ -69,16 +82,23 @@ class ScannerService {
       'beverage',
       'food',
       'ingredient',
+      'dish',
+      'meal',
+      'cuisine',
+      'produce',
     };
 
-    return foodCategories.any((category) =>
-        label.toLowerCase().contains(category));
+    // Проверяем совпадение с категориями
+    final labelLower = label.toLowerCase();
+    return foodCategories.any((category) => labelLower.contains(category));
   }
 
+  bool get isInitialized => _isInitialized;
   CameraController? get cameraController => _cameraController;
 
   Future<void> dispose() async {
     await _cameraController?.dispose();
     await _imageLabeler.close();
+    _isInitialized = false;
   }
 }
