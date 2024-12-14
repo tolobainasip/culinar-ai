@@ -1,0 +1,23 @@
+{
+    "name": "Culinario",
+    "short_name": "Culinario",
+    "start_url": ".",
+    "display": "standalone",
+    "background_color": "#13171C",
+    "theme_color": "#13171C",
+    "description": "Персональный кулинарный ассистент с AI",
+    "orientation": "portrait-primary",
+    "prefer_related_applications": false,
+    "icons": [
+        {
+            "src": "icons/Icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/Icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}
