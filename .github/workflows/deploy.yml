@@ -10,12 +10,20 @@ permissions:
   pages: write
   id-token: write
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
+# Allow only one concurrent deployment
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
 
+jobs:
+  build-and-deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -32,8 +40,14 @@ jobs:
       
       - name: Install dependencies
         run: |
+          flutter clean
           flutter pub get
           flutter doctor -v
+      
+      - name: Create required directories
+        run: |
+          mkdir -p assets/icons
+          touch assets/icons/.gitkeep
       
       - name: Build
         run: |
